@@ -1,0 +1,12 @@
+simulation:
+    num_agents: 200
+    area_size: 100
+    mobility: 1.0
+    initial_infected: 15
+
+disease:
+    infection_distance: 2.0
+    infection_probability: 0.3
+    incubation_time: 1
+    illness_duration: 14
+    mortality_rate: 0.02
