@@ -1,44 +1,79 @@
+# COVID-19 Simulation
 
-# COVID-19 Agent-Based Simulation
-
-This project provides a detailed agent-based simulation of infectious disease spread, allowing users to explore the dynamics of disease transmission under various scenarios. It visualizes the impact of social distancing and computes the basic reproduction number (R0) for different mobility levels.
+An agent-based simulation model for visualizing and analyzing the spread of COVID-19 in a population.
 
 ## Features
 
-- Interactive simulation of disease spread.
-- Real-time statistics visualization.
-- Customizable parameters: mobility, infection probability, incubation time, mortality rate, and more.
-- Analysis of social distancing's impact on the outbreak.
-- Calculation of the basic reproduction number (R0).
+-   Agent-based modeling of disease spread
+-   Configurable simulation parameters
+-   Real-time visualization of infection dynamics
+-   Statistical tracking and reporting
+-   Calculation of R0 (basic reproduction number)
 
 ## Requirements
 
-Before running the simulation, ensure the following dependencies are installed:
+-   Python 3.8+
+-   Dependencies listed in `requirements.txt`
 
-- Python 3.7+
-- NumPy
-- Matplotlib
-- Jupyter Notebook
+## Installation
 
-You can install the required packages using pip:
+1. Clone the repository
+2. Create a virtual environment:
+    ```
+    python -m venv .venv
+    ```
+3. Activate the virtual environment:
+    - Windows: `.venv\Scripts\activate`
+    - Mac/Linux: `source .venv/bin/activate`
+4. Install dependencies:
+    ```
+    pip install -r requirements.txt
+    ```
 
-```bash
-pip install numpy matplotlib notebook
+## Usage
+
+Run the simulation with default parameters:
+
+```
+python main.py
 ```
 
-## How to Use
+## Configuration
 
-1. Open the project in a Jupyter Notebook environment.
-2. Load the `covid_simulator_refined.ipynb` notebook.
-3. Adjust parameters in the notebook cells to customize the simulation.
-4. Run the notebook to visualize the simulation and analyze the results.
+You can modify the simulation parameters in `config.yaml`:
 
-## Files in the Project
+```yaml
+simulation:
+    num_agents: 200 # Number of individuals
+    area_size: 100 # Size of the simulation area
+    mobility: 1.0 # Movement range per step
+    initial_infected: 15 # Initial number of infected agents
 
-- `covid_simulator_refined.ipynb`: The main notebook for the simulation.
-- `simulation/`: Contains the simulation code modules.
-- `visualization/`: Includes functions for animating and plotting results.
+disease:
+    infection_distance: 2.0 # Distance within which infection can occur
+    infection_probability: 0.3 # Probability of infection per contact
+    incubation_time: 1 # Time steps before symptoms appear
+    illness_duration: 14 # Total duration of illness
+    mortality_rate: 0.02 # Probability of death
+```
 
-## Contact
+## Project Structure
 
-For any questions or improvements, feel free to reach out.
+-   `app/` - Main application code
+    -   `simulation/` - Core simulation logic
+    -   `visualization/` - Plotting and animation code
+    -   `utils/` - Utility functions
+-   `main.py` - Entry point for running the simulation
+-   `config.yaml` - Configuration parameters
+
+## Extending the Simulation
+
+The modular design allows for easy extension:
+
+-   Add new agent types by extending the `Agent` class
+-   Implement different infection models in the `Disease` class
+-   Create custom environments by modifying the `Environment` class
+
+## License
+
+MIT

@@ -1,12 +1,24 @@
 simulation:
-    num_agents: 200
-    area_size: 100
-    mobility: 1.0
-    initial_infected: 15
+    num_agents: 200 # Number of individuals in the simulation
+    area_size: 100 # Size of the simulation area (square)
+    mobility: 1.0 # Base mobility rate of agents
+    initial_infected: 5 # Number of initially infected agents
 
 disease:
-    infection_distance: 2.0
-    infection_probability: 0.3
-    incubation_time: 1
-    illness_duration: 14
-    mortality_rate: 0.02
+    infection_distance: 2.0 # Distance within which infection can occur
+    infection_probability: 0.3 # Probability of infection per contact
+    incubation_time: 5 # Time steps before symptoms appear
+    illness_duration: 14 # Duration of illness before recovery/death
+    mortality_rate: 0.02 # Probability of death from the disease
+
+environment:
+    boundary_type: "periodic" # Options: periodic, reflecting, absorbing
+    obstacles: [] # List of obstacles as [x, y, radius] - example: [[50, 50, 10]]
+
+visualization:
+    agent_size: 30 # Size of agent markers in visualization
+    animation_interval: 100 # Animation speed (milliseconds per frame)
+    color_susceptible: "blue"
+    color_ill: "red"
+    color_immune: "green"
+    color_dead: "black"
