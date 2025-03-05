@@ -5,7 +5,7 @@ import sys
 from .simulation.simulation import Simulation
 from .simulation.disease import Disease
 from .visualization.animate import animate_simulation_with_stats
-from .visualization.plot import plot_history, plot_r0
+from .visualization.plot import plot_history, plot_r0, plot_severity_distribution
 from .utils.logger import setup_logger
 from .utils.config import Config
 
@@ -58,6 +58,8 @@ def start_simulation():
     area_size = sim_params.get('area_size', 100)
     mobility = sim_params.get('mobility', 1.0)
     initial_infected = sim_params.get('initial_infected', 5)
+    mask_usage = sim_params.get('mask_usage', 0.0)
+    vaccination_rate = sim_params.get('vaccination_rate', 0.0)
 
     # Environment setup
     boundary_type = env_params.get('boundary_type', 'periodic')
@@ -91,7 +93,13 @@ def start_simulation():
     # Disease parameters
     disease = Disease(**disease_params)
 
+    # Log configuration summary
     logger.info(f"Initializing simulation with {num_agents} agents")
+    logger.info(
+        f"Mask usage: {mask_usage*100:.1f}%, Vaccination rate: {vaccination_rate*100:.1f}%")
+    logger.info(f"Disease parameters: R0 target range ~1.5-3.5")
+
+    # Create simulation with enhanced parameters
     sim = Simulation(
         num_agents=num_agents,
         area_size=area_size,
@@ -99,6 +107,8 @@ def start_simulation():
         disease=disease,
         environment=environment,
         initial_infected=initial_infected,
+        mask_usage=mask_usage,
+        vaccination_rate=vaccination_rate,
     )
 
     # Run simulation
@@ -119,9 +129,12 @@ def start_simulation():
             plot_history(sim, save_path=os.path.join(
                 args.output_dir, 'history.png'))
             plot_r0(sim, save_path=os.path.join(args.output_dir, 'r0.png'))
+            plot_severity_distribution(
+                sim, save_path=os.path.join(args.output_dir, 'severity.png'))
         else:
             plot_history(sim)
             plot_r0(sim)
+            plot_severity_distribution(sim)
 
         # Print summary statistics
         print("\nSimulation Summary:")
@@ -129,12 +142,26 @@ def start_simulation():
         print(
             f"Final susceptible: {sim.history['susceptible'][-1]} ({sim.history['susceptible'][-1]/sim.num_agents*100:.1f}%)")
         print(
+            f"Final exposed: {sim.history['exposed'][-1]} ({sim.history['exposed'][-1]/sim.num_agents*100:.1f}%)")
+        print(
+            f"Final presymptomatic: {sim.history['presymptomatic'][-1]} ({sim.history['presymptomatic'][-1]/sim.num_agents*100:.1f}%)")
+        print(
             f"Final ill: {sim.history['ill'][-1]} ({sim.history['ill'][-1]/sim.num_agents*100:.1f}%)")
         print(
             f"Final immune: {sim.history['immune'][-1]} ({sim.history['immune'][-1]/sim.num_agents*100:.1f}%)")
         print(
             f"Final dead: {sim.history['dead'][-1]} ({sim.history['dead'][-1]/sim.num_agents*100:.1f}%)")
         print(f"Basic reproduction number (R₀): {sim.calculate_R0():.2f}")
+
+        # Display severity statistics
+        severity_stats = sim.get_stats_by_severity()
+        if severity_stats['total'] > 0:
+            print("\nDisease Severity Distribution:")
+            for severity, percentage in severity_stats['percentages'].items():
+                if severity != 'unknown' and percentage > 0:
+                    print(
+                        f"  {severity.capitalize()}: {percentage:.1f}% ({severity_stats['counts'][severity]} cases)")
+
     else:
         # Run animation
         logger.info(

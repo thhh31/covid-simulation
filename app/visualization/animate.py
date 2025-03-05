@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from matplotlib.patches import Patch
 from ..simulation.agent import AgentState
 
 
@@ -17,7 +18,7 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
         Animation object
     """
     # Set up the figure and subplots
-    fig, (ax_sim, ax_stats) = plt.subplots(1, 2, figsize=(15, 7))
+    fig, (ax_sim, ax_stats) = plt.subplots(1, 2, figsize=(16, 8))
 
     # Simulation plot
     ax_sim.set_xlim(0, simulation.area_size)
@@ -40,6 +41,8 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
     ax_stats.set_ylim(0, simulation.num_agents)
     stats_lines = {
         'susceptible': ax_stats.plot([], [], label='Susceptible', lw=2, color='blue')[0],
+        'exposed': ax_stats.plot([], [], label='Exposed', lw=2, color='orange')[0],
+        'presymptomatic': ax_stats.plot([], [], label='Presymptomatic', lw=2, color='yellow')[0],
         'ill': ax_stats.plot([], [], label='Ill', lw=2, color='red')[0],
         'immune': ax_stats.plot([], [], label='Immune', lw=2, color='green')[0],
         'dead': ax_stats.plot([], [], label='Dead', lw=2, color='black')[0],
@@ -67,10 +70,32 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
         bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray')
     )
 
+    # Add new cases counter
+    new_cases_text = ax_sim.text(
+        0.05, 0.85, "New cases: 0",
+        transform=ax_sim.transAxes,
+        fontsize=10,
+        bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray')
+    )
+
+    # Add legend for agent states
+    state_legend_elements = [
+        Patch(facecolor='blue', label='Susceptible'),
+        Patch(facecolor='orange', label='Exposed'),
+        Patch(facecolor='yellow', label='Presymptomatic'),
+        Patch(facecolor='red', label='Ill'),
+        Patch(facecolor='green', label='Immune'),
+        Patch(facecolor='black', label='Dead'),
+    ]
+    ax_sim.legend(handles=state_legend_elements, loc='lower right',
+                  title="Agent States", framealpha=0.7)
+
     # Data to be updated
     time_data = []
     stats_data = {
         'susceptible': [],
+        'exposed': [],
+        'presymptomatic': [],
         'ill': [],
         'immune': [],
         'dead': [],
@@ -79,6 +104,8 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
     # Define colors with better contrast
     colors = {
         AgentState.SUSCEPTIBLE: 'blue',
+        AgentState.EXPOSED: 'orange',
+        AgentState.PRESYMPTOMATIC: 'yellow',
         AgentState.ILL: 'red',
         AgentState.IMMUNE: 'green',
         AgentState.DEAD: 'black',
@@ -99,6 +126,9 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
         # Update statistics
         time_data.append(frame)
         stats_data['susceptible'].append(simulation.history['susceptible'][-1])
+        stats_data['exposed'].append(simulation.history['exposed'][-1])
+        stats_data['presymptomatic'].append(
+            simulation.history['presymptomatic'][-1])
         stats_data['ill'].append(simulation.history['ill'][-1])
         stats_data['immune'].append(simulation.history['immune'][-1])
         stats_data['dead'].append(simulation.history['dead'][-1])
@@ -113,19 +143,25 @@ def animate_simulation_with_stats(simulation, frames=100, interval=200):
         # Update stats text
         stats_text.set_text(
             f"Susceptible: {simulation.history['susceptible'][-1]}\n"
+            f"Exposed: {simulation.history['exposed'][-1]}\n"
+            f"Presymptomatic: {simulation.history['presymptomatic'][-1]}\n"
             f"Ill: {simulation.history['ill'][-1]}\n"
             f"Immune: {simulation.history['immune'][-1]}\n"
             f"Dead: {simulation.history['dead'][-1]}"
         )
+
+        # Update new cases text
+        new_cases = simulation.history['new_cases'][-1] if simulation.history['new_cases'] else 0
+        new_cases_text.set_text(f"New cases: {new_cases}")
 
         # Update plot limits if needed
         ax_stats.relim()
         ax_stats.autoscale_view()
 
         # Add a title with simulation time
-        fig.suptitle(f"COVID-19 Simulation - Time Step: {frame}")
+        fig.suptitle(f"COVID-19 Simulation - Time Step: {frame} (Days)")
 
-        return scatter, *stats_lines.values(), r0_text, stats_text
+        return (scatter, *stats_lines.values(), r0_text, stats_text, new_cases_text)
 
     # Create animation
     anim = FuncAnimation(

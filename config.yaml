@@ -2,14 +2,19 @@ simulation:
     num_agents: 200 # Number of individuals in the simulation
     area_size: 100 # Size of the simulation area (square)
     mobility: 1.0 # Base mobility rate of agents
-    initial_infected: 5 # Number of initially infected agents
+    initial_infected: 15 # Number of initially infected agents
+    mask_usage: 0.3 # Proportion of population wearing masks (30%)
+    vaccination_rate: 0.5 # Proportion of population vaccinated (50%)
 
 disease:
-    infection_distance: 2.0 # Distance within which infection can occur
-    infection_probability: 0.3 # Probability of infection per contact
-    incubation_time: 5 # Time steps before symptoms appear
-    illness_duration: 14 # Duration of illness before recovery/death
-    mortality_rate: 0.02 # Probability of death from the disease
+    infection_distance: 1.5 # Distance within which infection can occur (meters)
+    infection_probability: 0.3 # Base probability of infection per contact
+    incubation_time: 5 # Average time before symptoms appear (days)
+    presymptomatic_infectious_period: 2 # Days before symptoms when already infectious
+    mortality_rate: 0.015 # Base probability of death (1.5%)
+    # Severity distribution is handled within the Disease class
+    # Age mortality modifiers are handled within the Disease class
+    # Recovery times by severity are handled within the Disease class
 
 environment:
     boundary_type: "periodic" # Options: periodic, reflecting, absorbing
@@ -19,6 +24,8 @@ visualization:
     agent_size: 30 # Size of agent markers in visualization
     animation_interval: 100 # Animation speed (milliseconds per frame)
     color_susceptible: "blue"
+    color_exposed: "orange"
+    color_presymptomatic: "yellow"
     color_ill: "red"
     color_immune: "green"
     color_dead: "black"
