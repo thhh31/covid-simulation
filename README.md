@@ -32,7 +32,3 @@ The `config.yaml` file allows you to adjust population size, disease parameters,
 ## Model Details
 
 The simulation tracks agents through various states (susceptible, exposed, ill, immune, dead) and features realistic elements like distance-based transmission, age-dependent severity, and intervention effects.
-
-## License
-
-[MIT License](LICENSE)
